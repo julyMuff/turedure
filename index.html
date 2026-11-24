@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>徒然吹く　届く福？</title>
+<style>
+:root{color-scheme:light;--paper:#f8f3e9;--white:#fffcf6;--ink:#342e28;--muted:#655a4e;--line:#e6dacb;--red:#963f31;--green:#3e5e4c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 system-ui,sans-serif}
+button,textarea{font:inherit}button,summary{cursor:pointer}
+button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.wrap{width:min(1080px,calc(100% - 40px));margin:auto}
+header{border-bottom:1px solid var(--line);background:var(--white)}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:13px}
+.brand strong{color:var(--red);font-family:serif}.stamp{font-size:.76rem;color:var(--muted)}
+.banner{position:relative;isolation:isolate;overflow:hidden;margin:24px 0 26px;padding:34px 42px;background:#f0ded0;border:1px solid #e7d2c2;border-radius:24px}
+.banner h1{margin:0;color:#663328;font:700 clamp(1.8rem,5.5vw,3.2rem)/1.25 "Yu Mincho",serif;letter-spacing:.06em}
+.banner p{margin:12px 0 0;color:#5f483e}
+.art{position:absolute;z-index:-1;right:5%;top:50%;translate:0 -50%;width:200px;height:200px;border-radius:50%;background:#e7c1aa}
+.saucer,.cup,.tea{position:absolute;border-radius:50%}.saucer{width:142px;height:142px;background:#eadfc3;inset:29px;box-shadow:0 7px 0 #b3816b}.cup{inset:48px;background:#ffefcc;box-shadow:0 5px 0 #a99169}.tea{inset:58px;background:radial-gradient(ellipse at 33% 29%,#aaa16b,#637251 74%);border:2px solid #696f48}
+.grid{display:grid;grid-template-columns:245px minmax(0,1fr);gap:28px;align-items:start}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:20px}
+h2{font-size:1.05rem;margin:0 0 12px}h3{font-size:.98rem;margin:0}
+.rooms{display:grid;gap:6px}.rooms button{text-align:left;padding:9px 11px;color:var(--ink);background:transparent;border:1px solid transparent;border-radius:9px}
+.rooms button[aria-pressed=true]{background:#edeee2;color:#354c3b;border-color:#d9decc;font-weight:700}
+.rooms button:hover,.example:hover{background:#f0e8dc}
+.guide{background:#edeee2;border-color:#dce1d0;margin-top:14px;color:#354c3b}
+.guide p{font-size:.88rem;margin:6px 0 12px}
+.example{border:1px solid #b4bdac;border-radius:8px;color:#354c3b;background:#fafaf0;padding:5px 9px;font-size:.83rem}
+.roomTitle{font:700 1.55rem/1.35 "Yu Mincho",serif;margin:0 0 13px}
+label{font-weight:700;display:block;margin-bottom:8px}
+textarea{display:block;width:100%;min-height:105px;resize:vertical;border:1px solid #d9cbb9;border-radius:12px;background:#fcf8f0;color:var(--ink);padding:12px}
+.actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px}
+#count,.subtle{color:var(--muted);font-size:.82rem}#count.over{color:var(--red);font-weight:bold}
+.submit{background:var(--red);color:#fff;border:0;border-radius:10px;padding:8px 21px;font-weight:700}.submit:disabled{background:#eee0d8;color:#70574b;cursor:default}
+.feedTitle{margin:24px 0 10px}.post{margin-bottom:12px}.who{display:flex;align-items:center;gap:9px;font-weight:650}.avatar{display:grid;place-items:center;background:#f1decf;color:#743d30;width:33px;height:33px;border-radius:50%;flex:none}.tag{font-size:.7rem;color:var(--muted);font-weight:400}
+.message,.reply p,.note p{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}
+.reply{border-left:2px solid #c9d2bc;padding-left:12px;margin:14px 0 0 10px;color:#354c3b;font-size:.92rem}
+.note{margin-top:14px;border-radius:10px;background:#f4eee1;padding:8px 11px;font-size:.85rem}
+.note summary{color:#614f38;font-weight:650}
+footer{margin:20px 0 28px}#status{margin:10px 0 0}#status:empty{margin:0}.demo-info{margin-bottom:20px;background:#edeee2}.demo-info p{margin:0}.guide .example{margin:3px 0}.rooms button span[lang=it]{display:block;font-size:.8em}
+@media(max-width:730px){.grid{grid-template-columns:1fr;gap:20px}.rooms{grid-template-columns:repeat(2,minmax(0,1fr))}.rooms button{font-size:.87rem}.banner{padding:26px 20px}.art{right:-75px;opacity:.33}.panel{padding:15px}.wrap{width:calc(100% - 24px)}}
+</style>
+</head>
+<body>
+<header><div class="wrap brand"><strong>徒然吹く　届く福？</strong><span class="stamp">体験版 / <span lang="it">Demo</span></span></div></header>
+<main class="wrap">
+  <section class="banner">
+    <h1>徒然吹く　届く福？</h1>
+    <p>イタリア語・日本語で、日常のひとこと。<br><span lang="it">Piccoli momenti di ogni giorno, in italiano e in giapponese.</span></p>
+    <div class="art" aria-hidden="true"><div class="saucer"></div><div class="cup"></div><div class="tea"></div></div>
+  </section>
+  <section class="panel demo-info" aria-label="この体験版について / Informazioni sulla demo"><p>投稿はこのブラウザだけで見られます。登場人物と返信はサンプルです。</p><p lang="it">I messaggi restano in questo browser. I personaggi e le risposte sono fittizi.</p></section>
+  <div class="grid">
+    <aside>
+      <nav class="panel" aria-labelledby="rooms-title"><h2 id="rooms-title">部屋を選ぶ <span lang="it">/ Scegli una stanza</span></h2><div class="rooms" id="rooms"></div></nav>
+      <section class="panel guide" aria-labelledby="guide-title">
+        <h3 id="guide-title">1単語だけ混ぜてみよう！<br><span lang="it">Prova ad aggiungere una parola!</span></h3>
+        <p>いつもの文に、知っている単語をひとつ。文法やつづりのヒントは、投稿後の「届いた福」で。</p><p lang="it">Aggiungi una parola nell’altra lingua. Dopo aver inviato il messaggio, apri il suggerimento sotto il tuo post.</p>
+        <button class="example" id="example" type="button">例文を使う</button>
+        <button class="example" id="example-it" type="button" lang="it">Prova un esempio</button>
+      </section>
+    </aside>
+    <section aria-labelledby="room-title">
+      <h2 class="roomTitle" id="room-title"></h2>
+      <section class="panel" aria-labelledby="composer-label">
+        <label id="composer-label" for="draft">きょうの徒然 <span lang="it">/ Un pensiero di oggi</span></label>
+        <textarea id="draft" aria-describedby="count" placeholder="今日はちょっと疲れた。Io stanca."></textarea>
+        <div class="actions"><span id="count">0 / 100文字 / caratteri</span><button class="submit" id="publish" type="button" disabled>吹く <span lang="it">/ Invia</span> →</button></div>
+        <p class="subtle" id="status" role="status"></p>
+      </section>
+      <h2 class="feedTitle">みんなの徒然 <span lang="it">/ I messaggi</span></h2>
+      <div id="feed"></div>
+    </section>
+  </div>
+  <footer class="subtle">日本語・イタリア語を混ぜて、1投稿100文字まで。<br><span lang="it">Puoi mescolare le lingue. Fino a 100 caratteri per messaggio.</span></footer>
+</main>
+
+<template id="post-template">
+  <article class="panel post">
+    <div class="who"><span class="avatar" aria-hidden="true"></span><span class="name"></span><span class="tag"></span></div>
+    <p class="message" dir="auto"></p>
+    <div class="reply" hidden><h3></h3><p dir="auto"></p></div>
+    <details class="note" hidden><summary>届いた福 · お手伝いさんのヒント / <span lang="it">Suggerimento della demo</span></summary><p dir="auto"></p></details>
+  </article>
+</template>
+
+<script>
+'use strict';
+const rooms = [
+  { id:'young', label:'10代・20代ルーム', it:'10–29 anni', people:[['Giulia',22],['Luca',19]], sample:'今日は学校の帰りに gelato を食べた。Pistacchio がすき！' },
+  { id:'adult', label:'30代・40代ルーム', it:'30–49 anni', people:[['Elena',34],['Marco',43]], sample:'仕事のあとに散歩したよ。Oggi は空がきれい。' },
+  { id:'senior', label:'大人・シニアの縁側', it:'Dai 50 anni', people:[['Paola',64],['Carlo',57]], sample:'今朝は庭で花が咲いた。Che bello!' },
+  { id:'all', label:'全世代広場', it:'Tutte le età', people:[['Sofia',26],['Renato',61],['Anna',38]], sample:'Buongiorno! 今日はパンを焼いてみたよ。' }
+];
+
+// モックはよくある書き方の例にだけ反応する。
+const grammarTips = [
+  [/今日は楽しいでした/u, () => '「今日は楽しかったです」と言うよ。\nIn giapponese, al passato, 楽しい diventa 楽しかった. Per essere cortesi si aggiunge です.'],
+  [/\bio\s+stanc([ao])\b/iu, (_, ending) =>
+    '「私は疲れている」と言うなら「Sono stanc' + ending.toLowerCase() + '」。イタリア語では「私は〜です」の sono を入れるよ。'],
+  [/\b(?:mi\s+piace|mi\s+piacciono)\s+gelato\b/iu, () =>
+    '「アイスが好き」なら「Mi piace il gelato」。gelato の前に il をつけると自然だよ。'],
+  [/\bi\s+(?:very\s+)?(?:happy|hapy)\b/iu, match =>
+    '「' + (/\bvery\b/i.test(match) ? 'I’m very happy' : 'I’m happy') + '」と言えるよ。I のあとに am（I’m の ’m）を入れると「私は〜です」になるよ。'],
+  [/\bshe\s+like\s+coffee\b/iu, () =>
+    '「She likes coffee」が自然だよ。「彼女は」の she のあとでは、like の最後に s がつくよ。']
+];
+
+const words = [
+  [/\bbuongiorno\b/iu, '「buongiorno」は、朝から昼ごろに使える「おはよう」「こんにちは」だよ。'],
+  [/\bbongiorno\b/iu, '「おはよう」と言いたかったら、「buongiorno」と書くよ。最初は buo だよ。'],
+  [/\bgracie\b/iu, '「ありがとう」と言いたかったら、「grazie」と書くよ。真ん中は z だよ。'],
+  [/\bgrazie\b/iu, '「grazie」はイタリア語で「ありがとう」だよ。'],
+  [/\bcaffè(?!\p{Script=Latin})/iu, '「caffè」はイタリア語で「コーヒー」。最後の è に印がつくよ。'],
+  [/\bcaffe(?!\p{Script=Latin})/iu, 'イタリア語で「コーヒー」と書くなら「caffè」。最後は è だよ。'],
+  [/\bche bello\b/iu, '「che bello!」は「わあ、いいね！」と、うれしいときに使えるよ。'],
+  [/\bciao\b/iu, '「ciao」は、親しい人に会ったときも、別れるときも使えるあいさつだよ。'],
+  [/\bgelato\b/iu, '「gelato」はイタリア語で「アイスクリーム」だよ。'],
+  [/\boggi\b/iu, '「oggi」はイタリア語で「きょう」だよ。'],
+  [/\bstanca\b/iu, '「sono stanca」で「私は疲れた」。女性が自分のことを言うときの形だよ。'],
+  [/\bcoffee\b/iu, '「coffee」は英語で「コーヒー」。イタリア語の「caffè」と並べて覚えられるね。'],
+  [/\b(?:happy|hapy)\b/iu, '「うれしい」は英語で「happy」。p を二つ並べて書くよ。'],
+  [/\btoday\b/iu, '「today」は英語で「きょう」。「today was fun」で「今日は楽しかった」。']
+];
+const pick = items => items[Math.floor(Math.random() * items.length)];
+
+function mockMemo(message) {
+  const text = message.normalize('NFC');
+  const grammar = grammarTips.find(([pattern]) => pattern.test(text));
+  const word = words.find(([pattern]) => pattern.test(text));
+  const tip = (grammar && grammar[1](...text.match(grammar[0]))) ?? word?.[1] ?? '次に気が向いたら、「きょう」を「oggi」（イタリア語）や「today」（英語）にしてみてもいいね。\nIn giapponese, きょう (kyō) significa «oggi».';
+  return pick(['ひとこと、ありがとう。 / Grazie per aver scritto!', '書いてくれてありがとう。 / Grazie per il messaggio!']) + '\n' + tip;
+}
+
+function mockReply(message, room) {
+  const [name, age] = pick(room.people);
+  const options = /疲れ|stanc[oa]|tired/iu.test(message)
+    ? ['Piano piano。ゆっくり休んでね。', 'おつかれさま。Un tè? お茶でもどう？']
+    : /caff[eè]|coffee|コーヒー/iu.test(message)
+      ? ['Anche a me piace il caffè! コーヒー、ぼくも好き。', 'Caffè、いいね。砂糖は入れる？ Con zucchero?']
+      : ['Ciao! きょうのひとこと、grazie。', '読んだよ。E tu, come stai? 元気にしてる？', 'Grazie! ぼくも日本語をすこし練習したよ。'];
+  return { name, age, text:pick(options) };
+}
+
+// 空欄なら完全オフライン。実AIを使う場合は公開ホスト上で同一オリジンの
+// POST エンドポイント（例: /api/memo）を設定する。
+// リクエスト JSON: { message }。成功レスポンス JSON: { memo: "相づち\nやさしいヒント" }。
+// サーバーで投稿を検証し、環境変数のAPIキーでAIを呼び出す。
+// 返すメモは、短い相づちと、文法・自然な言い方・つづりのうち一つのヒント。
+// ローカルのHTMLを直接開いた場合は引き続きモックを使う。
+const memoEndpoint = '';
+async function getMemo(message, fallback) {
+  if (!memoEndpoint || location.protocol === 'file:') return fallback;
+  try {
+    const response = await fetch(memoEndpoint, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ message }),
+      signal:AbortSignal.timeout(8000)
+    });
+    if (!response.ok) return fallback;
+    const { memo } = await response.json();
+    return typeof memo === 'string' && memo.trim() ? memo.trim().slice(0, 500) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+const $ = id => document.getElementById(id);
+const storageKey = 'tsurezure-posts-v1';
+let posts = [];
+try {
+  const saved = JSON.parse(localStorage.getItem(storageKey) ?? '[]');
+  if (Array.isArray(saved)) posts = saved;
+} catch { /* 保存を利用できなくても画面内では投稿できる */ }
+
+function save() {
+  try { localStorage.setItem(storageKey, JSON.stringify(posts)); }
+  catch { /* 保存できない環境ではこのページを開いている間だけ保持する */ }
+}
+
+let room = rooms[0];
+const drafts = new Map();
+const limit = 100;
+const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity:'grapheme' }) : null;
+const lengthOf = text => segmenter ? Array.from(segmenter.segment(text)).length : Array.from(text).length;
+const draft = $('draft');
+
+function updateCount() {
+  const length = lengthOf(draft.value);
+  $('count').textContent = length + ' / ' + limit + '文字 / caratteri';
+  $('count').classList.toggle('over', length > limit);
+  draft.setAttribute('aria-invalid', String(length > limit));
+  $('publish').disabled = length > limit || !draft.value.trim();
+}
+
+function makePost(post) {
+  const card = $('post-template').content.cloneNode(true);
+  const set = (selector, value) => { card.querySelector(selector).textContent = value; };
+  set('.avatar', Array.from(post.name)[0]);
+  set('.name', post.name);
+  set('.tag', post.age ? post.age + '歳 · サンプル / Esempio' : '自分の投稿 / Tu');
+  set('.message', post.message);
+  if (post.reply) {
+    card.querySelector('.reply').hidden = false;
+    set('.reply h3', post.reply.name + ' · ' + post.reply.age + '歳 · 模擬返信 / Risposta simulata');
+    set('.reply p', post.reply.text);
+  }
+  if (post.memo) {
+    card.querySelector('.note').hidden = false;
+    set('.note p', post.memo);
+  }
+  return card;
+}
+
+function setRoomLabel(node, entry) {
+  const italian = document.createElement('span');
+  italian.lang = 'it';
+  italian.textContent = ' / ' + entry.it;
+  node.textContent = entry.label;
+  node.append(italian);
+}
+
+function showRoom(next) {
+  drafts.set(room.id, draft.value);
+  room = next;
+  $('status').textContent = '';
+  draft.value = drafts.get(room.id) ?? '';
+  setRoomLabel($('room-title'), room);
+  for (const button of $('rooms').children) {
+    button.setAttribute('aria-pressed', String(button.dataset.room === room.id));
+  }
+  const [name, age] = room.people[0];
+  $('feed').replaceChildren(
+    ...posts.filter(post => post.roomId === room.id).map(makePost),
+    makePost({ name, age, message:room.sample })
+  );
+  updateCount();
+}
+
+for (const entry of rooms) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  setRoomLabel(button, entry);
+  button.dataset.room = entry.id;
+  button.addEventListener('click', () => showRoom(entry));
+  $('rooms').append(button);
+}
+
+draft.addEventListener('input', () => {
+  $('status').textContent = '';
+  updateCount();
+});
+$('example').addEventListener('click', () => {
+  if (!draft.value.trim()) draft.value = '今日はちょっと疲れた。Io stanca.';
+  updateCount();
+  draft.focus();
+});
+
+$('example-it').addEventListener('click', () => {
+  if (!draft.value.trim()) draft.value = 'Oggi sono andata al parco. 今日は楽しいでした。';
+  updateCount();
+  draft.focus();
+});
+
+async function publishDraft() {
+  const message = draft.value;
+  if (!message.trim() || lengthOf(message) > limit) return;
+
+  const post = { roomId:room.id, name:'あなた', message };
+  try {
+    post.memo = mockMemo(message);
+    post.reply = mockReply(message, room);
+  } catch (error) {
+    console.error('メモまたは返信の作成に失敗しました。', error);
+  }
+
+  try {
+    $('feed').prepend(makePost(post));
+  } catch (error) {
+    console.error('投稿の表示に失敗しました。', error);
+    $('status').textContent = '投稿を表示できませんでした。入力した文は残っています。 / Invio non riuscito. Il testo è ancora nel campo.';
+    return;
+  }
+
+  posts.unshift(post);
+  save();
+  draft.value = '';
+  updateCount();
+  $('status').textContent = post.memo && post.reply
+    ? '投稿しました。模擬返信とお手伝いさんのメモが届きました。'
+    : '投稿しました。';
+  $('status').textContent += ' / Messaggio inviato.';
+  if (memoEndpoint && post.memo) {
+    const memoText = $('feed').firstElementChild.querySelector('.note p');
+    post.memo = await getMemo(message, post.memo);
+    save();
+    if (memoText.isConnected) memoText.textContent = post.memo;
+    else if (room.id === post.roomId) {
+      const index = posts.filter(item => item.roomId === room.id).indexOf(post);
+      const visibleMemo = $('feed').children[index]?.querySelector('.note p');
+      if (visibleMemo) visibleMemo.textContent = post.memo;
+    }
+  }
+}
+
+$('publish').addEventListener('click', publishDraft);
+draft.addEventListener('keydown', event => {
+  if (event.isComposing || event.repeat || event.key !== 'Enter' || !(event.ctrlKey || event.metaKey)) return;
+  event.preventDefault();
+  publishDraft();
+});
+
+showRoom(room);
+</script>
+</body>
+</html>
