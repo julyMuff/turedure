@@ -41,6 +41,7 @@ textarea{display:block;width:100%;min-height:105px;resize:vertical;border:1px so
 .note summary{color:#614f38;font-weight:650}
 footer{margin:20px 0 28px}#status{margin:10px 0 0}#status:empty{margin:0}.demo-info{margin-bottom:20px;background:#edeee2}.demo-info p{margin:0}.guide .example{margin:3px 0}.rooms button span[lang=it]{display:block;font-size:.8em}
 @media(max-width:730px){.grid{grid-template-columns:1fr;gap:20px}.rooms{grid-template-columns:repeat(2,minmax(0,1fr))}.rooms button{font-size:.87rem}.banner{padding:26px 20px}.art{right:-75px;opacity:.33}.panel{padding:15px}.wrap{width:calc(100% - 24px)}}
+.post-modes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.post-modes [aria-pressed=true]{background:#405a47;color:#fff}.daily-topic{margin-bottom:14px;padding:10px 12px;background:#edeee2;border-radius:10px}
 </style>
 </head>
 <body>
@@ -64,13 +65,18 @@ footer{margin:20px 0 28px}#status{margin:10px 0 0}#status:empty{margin:0}.demo-i
     </aside>
     <section aria-labelledby="room-title">
       <h2 class="roomTitle" id="room-title"></h2>
+      <nav class="post-modes" aria-label="投稿の種類 / Tipo di messaggio">
+        <button type="button" class="example" id="daily-mode" aria-pressed="true">今日のお題 / Tema del giorno</button>
+        <button type="button" class="example" id="free-mode" aria-pressed="false">自由なつぶやき / Messaggi liberi</button>
+      </nav>
       <section class="panel" aria-labelledby="composer-label">
+        <div id="daily-topic" class="daily-topic"><strong id="topic-ja"></strong><br><span id="topic-it" lang="it"></span></div>
         <label id="composer-label" for="draft">きょうの徒然 <span lang="it">/ Un pensiero di oggi</span></label>
         <textarea id="draft" aria-describedby="count" placeholder="今日はちょっと疲れた。Io stanca."></textarea>
         <div class="actions"><span id="count">0 / 100文字 / caratteri</span><button class="submit" id="publish" type="button" disabled>吹く <span lang="it">/ Invia</span> →</button></div>
         <p class="subtle" id="status" role="status"></p>
       </section>
-      <h2 class="feedTitle">みんなの徒然 <span lang="it">/ I messaggi</span></h2>
+      <h2 class="feedTitle"><span id="feed-ja">お題への回答</span> <span id="feed-it" lang="it">/ Risposte al tema</span></h2>
       <div id="feed"></div>
     </section>
   </div>
@@ -169,10 +175,10 @@ async function getMemo(message, fallback) {
 }
 
 const $ = id => document.getElementById(id);
-const storageKey = 'tsurezure-posts-v1';
+const storageKey = 'turedure-posts-v1';
 let posts = [];
 try {
-  const saved = JSON.parse(localStorage.getItem(storageKey) ?? '[]');
+  const saved = JSON.parse(localStorage.getItem(storageKey) ?? localStorage.getItem('tsu' + 'rezure-posts-v1') ?? '[]');
   if (Array.isArray(saved)) posts = saved;
 } catch { /* 保存を利用できなくても画面内では投稿できる */ }
 
@@ -183,6 +189,47 @@ function save() {
 
 let room = rooms[0];
 const drafts = new Map();
+let mode = 'daily';
+let dailyTopic;
+const topics = [
+  ['今日食べたものは？', 'Che cosa hai mangiato oggi?'],
+  ['好きな季節は？', 'Qual è la tua stagione preferita?'],
+  ['今朝、最初に何をした？', 'Qual è la prima cosa che hai fatto stamattina?'],
+  ['どんな音楽を聴く？', 'Che musica ascolti?'],
+  ['散歩するならどこに行く？', 'Dove andresti a fare una passeggiata?'],
+  ['いま窓の外に何が見える？', 'Che cosa vedi adesso dalla finestra?'],
+  ['今日はどんな天気？', 'Com’è il tempo oggi?'],
+  ['好きな飲み物は？', 'Qual è la tua bevanda preferita?'],
+  ['最近覚えた言葉は？', 'Quale parola hai imparato di recente?'],
+  ['休みの日に何をする？', 'Che cosa fai nei giorni liberi?'],
+  ['今日ちょっとうれしかったことは？', 'Quale piccola cosa ti ha fatto sorridere oggi?']
+];
+const japanDate = new Intl.DateTimeFormat('en-US', {
+  timeZone:'Asia/Tokyo', year:'numeric', month:'numeric', day:'numeric'
+});
+
+function topicToday(now = new Date()) {
+  const parts = Object.fromEntries(japanDate.formatToParts(now).map(({type, value}) => [type, Number(value)]));
+  const day = Date.UTC(parts.year, parts.month - 1, parts.day) / 86400000;
+  const cycle = Math.floor(day / topics.length);
+  const position = ((day % topics.length) + topics.length) % topics.length;
+  const shuffled = topics.slice(1, -1);
+  let seed = cycle >>> 0;
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const j = seed % (i + 1);
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  // お題を一巡させ、期間をまたいでも同じお題が連続しないようにする。
+  shuffled.unshift(topics[0]);
+  shuffled.push(topics.at(-1));
+  const [ja, it] = shuffled[position];
+  return { day, ja, it };
+}
+
+const draftKey = () => room.id + ':' + (mode === 'daily' ? dailyTopic.day : 'free');
+const matchesFeed = post => post.roomId === room.id &&
+  (mode === 'daily' ? post.topicDay === dailyTopic.day : post.topicDay == null);
 const limit = 100;
 const segmenter = typeof Intl.Segmenter === 'function' ? new Intl.Segmenter('ja', { granularity:'grapheme' }) : null;
 const lengthOf = text => segmenter ? Array.from(segmenter.segment(text)).length : Array.from(text).length;
@@ -223,22 +270,43 @@ function setRoomLabel(node, entry) {
   node.append(italian);
 }
 
-function showRoom(next) {
-  drafts.set(room.id, draft.value);
+function showRoom(next, nextMode = mode, topic = topicToday()) {
+  if (dailyTopic) drafts.set(draftKey(), draft.value);
   room = next;
+  mode = nextMode;
+  dailyTopic = topic;
+  const isDaily = mode === 'daily';
   $('status').textContent = '';
-  draft.value = drafts.get(room.id) ?? '';
+  draft.value = drafts.get(draftKey()) ?? '';
+  $('daily-mode').setAttribute('aria-pressed', String(isDaily));
+  $('free-mode').setAttribute('aria-pressed', String(!isDaily));
+  $('daily-topic').hidden = !isDaily;
+  $('topic-ja').textContent = topic.ja;
+  $('topic-it').textContent = topic.it;
+  draft.setAttribute('aria-describedby', isDaily ? 'daily-topic count' : 'count');
+  $('feed-ja').textContent = isDaily ? 'お題への回答' : '自由なつぶやき';
+  $('feed-it').textContent = isDaily ? '/ Risposte al tema' : '/ Messaggi liberi';
   setRoomLabel($('room-title'), room);
   for (const button of $('rooms').children) {
     button.setAttribute('aria-pressed', String(button.dataset.room === room.id));
   }
-  const [name, age] = room.people[0];
-  $('feed').replaceChildren(
-    ...posts.filter(post => post.roomId === room.id).map(makePost),
-    makePost({ name, age, message:room.sample })
-  );
+  const cards = posts.filter(matchesFeed).map(makePost);
+  if (!isDaily) {
+    const [name, age] = room.people[0];
+    cards.push(makePost({ name, age, message:room.sample }));
+  }
+  $('feed').replaceChildren(...cards);
   updateCount();
 }
+
+$('daily-mode').addEventListener('click', () => showRoom(room, 'daily'));
+$('free-mode').addEventListener('click', () => showRoom(room, 'free'));
+function refreshTopic() {
+  const topic = topicToday();
+  if (topic.day !== dailyTopic.day) showRoom(room, mode, topic);
+}
+document.addEventListener('visibilitychange', refreshTopic);
+setInterval(refreshTopic, 30000);
 
 for (const entry of rooms) {
   const button = document.createElement('button');
@@ -254,12 +322,14 @@ draft.addEventListener('input', () => {
   updateCount();
 });
 $('example').addEventListener('click', () => {
+  if (mode !== 'free') showRoom(room, 'free');
   if (!draft.value.trim()) draft.value = '今日はちょっと疲れた。Io stanca.';
   updateCount();
   draft.focus();
 });
 
 $('example-it').addEventListener('click', () => {
+  if (mode !== 'free') showRoom(room, 'free');
   if (!draft.value.trim()) draft.value = 'Oggi sono andata al parco. 今日は楽しいでした。';
   updateCount();
   draft.focus();
@@ -270,6 +340,7 @@ async function publishDraft() {
   if (!message.trim() || lengthOf(message) > limit) return;
 
   const post = { roomId:room.id, name:'あなた', message };
+  if (mode === 'daily') post.topicDay = dailyTopic.day;
   try {
     post.memo = mockMemo(message);
     post.reply = mockReply(message, room);
@@ -299,7 +370,7 @@ async function publishDraft() {
     save();
     if (memoText.isConnected) memoText.textContent = post.memo;
     else if (room.id === post.roomId) {
-      const index = posts.filter(item => item.roomId === room.id).indexOf(post);
+      const index = posts.filter(matchesFeed).indexOf(post);
       const visibleMemo = $('feed').children[index]?.querySelector('.note p');
       if (visibleMemo) visibleMemo.textContent = post.memo;
     }
